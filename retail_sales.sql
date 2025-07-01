@@ -12,141 +12,139 @@ CREATE TABLE retail_sales(
 	gender VARCHAR(15),
 	age INT,
 	category VARCHAR(15),
-	quantiy INT,    
+	quantity INT,    
 	price_per_unit FLOAT,
 	cogs FLOAT,
 	total_sale FLOAT
 );
 
--- Data Cleaning
-SELECT * 
-	FROM retail_sales
-WHERE 
-	transactions_id IS NULL
-	OR
-	sale_date IS NULL
-	OR
-	sale_time IS NULL
-	OR
-	customer_id IS NULL
-	OR
-	gender IS NULL
-	OR
-	category IS NULL
-	OR
-	quantiy IS NULL
-	OR 
-	price_per_unit IS NULL
-	OR
-	cogs IS NULL
-	OR
-	total_sale IS NULL;
+-- 1.Data Cleaning 
 
---
+-- Inspect rows with NULL values
+SELECT * 
+FROM retail_sales
+WHERE 
+    transactions_id IS NULL OR
+    sale_date IS NULL OR
+    sale_time IS NULL OR
+    customer_id IS NULL OR
+    gender IS NULL OR
+    category IS NULL OR
+    quantity IS NULL OR  
+    price_per_unit IS NULL OR
+    cogs IS NULL OR
+    total_sale IS NULL;
+
+-- Delete rows with NULL values
 DELETE FROM retail_sales
 WHERE 
-	transactions_id IS NULL
-	OR
-	sale_date IS NULL
-	OR
-	sale_time IS NULL
-	OR
-	customer_id IS NULL
-	OR
-	gender IS NULL
-	OR
-	category IS NULL
-	OR
-	quantiy IS NULL
-	OR 
-	price_per_unit IS NULL
-	OR
-	cogs IS NULL
-	OR
-	total_sale IS NULL;
+    transactions_id IS NULL OR
+    sale_date IS NULL OR
+    sale_time IS NULL OR
+    customer_id IS NULL OR
+    gender IS NULL OR
+    category IS NULL OR
+    quantity IS NULL OR 
+    price_per_unit IS NULL OR
+    cogs IS NULL OR
+    total_sale IS NULL;
+    
+    -- Find duplicates
+SELECT transactions_id, COUNT(*) 
+FROM retail_sales
+GROUP BY transactions_id
+HAVING COUNT(*) > 1;
 
--- Data Exploration
+-- Check gender values
+SELECT DISTINCT gender FROM retail_sales;
 
--- 1. How many sales we have?
+-- 2.Data Exploration
+
+-- View Sample Records
+SELECT * 
+FROM retail_sales
+LIMIT 10;
+
+-- Total number of rows
+SELECT COUNT(*) AS total_rows 
+FROM retail_sales;
+
+-- Column names and types (for MySQL)
+SHOW COLUMNS FROM retail_sales;
+
+--  Date Range of Sales
+SELECT 
+    MIN(sale_date) AS first_sale_date,
+    MAX(sale_date) AS last_sale_date
+FROM retail_sales;
+
+-- 1. Total number of sales
 SELECT COUNT(*) AS total_sales FROM retail_sales;
 
--- 2. How many uniuque customers we have?
-SELECT COUNT(DISTINCT customer_id) FROM retail_sales;
+-- 2. Total number of unique customers
+SELECT COUNT(DISTINCT customer_id) AS unique_customers FROM retail_sales;
 
--- 2. How many uniuque category we have?
+--  3. Unique categories
 SELECT DISTINCT category FROM retail_sales;
 
--- Data Analysis & Business Key Problems & Answers
+-- Data Analysis & Business Key Questions
 
--- Q.1 Write a SQL query to retrieve all columns for sales made on '2022-11-05
-
+--  Q1: Sales made on '2022-11-05'
 SELECT * 
 FROM retail_sales
 WHERE sale_date = '2022-11-05';
 
--- Q.2 Write a SQL query to retrieve all transactions where the category is 'Clothing'
--- and the quantity sold is more then 10 in the month of Nov 2022
-
+--  Q2: 'Clothing' category sales with quantity >= 4 in Nov 2022
 SELECT *
 FROM retail_sales 
 WHERE 
-	category = 'Clothing'
-	AND
-	date_format(sale_date, '%Y-%m') = '2022-11'
-	AND
-	quantiy >= 4;
+    category = 'Clothing'
+    AND DATE_FORMAT(sale_date, '%Y-%m') = '2022-11'
+    AND quantity >= 4;
 
--- Q.3 Write a SQL query to calculate the total sales (total sales) for each category.
-
+-- Q3: Total sales and orders per category
 SELECT 
-	category,
-	SUM(total_sale) AS net_sales,
-	COUNT(*) AS total_orders
+    category,
+    SUM(total_sale) AS net_sales,
+    COUNT(*) AS total_orders
 FROM retail_sales
-GROUP BY 1;
+GROUP BY category;
 
--- Q.4 Write a SQL query to find the average age of customers who purchased iteam from the 'Beauty' Category
-
+-- Q4: Average age of customers in 'Beauty' category
 SELECT
-	ROUND(AVG(age), 2) AS avg_age
+    ROUND(AVG(age), 2) AS avg_age
 FROM retail_sales 
 WHERE category = 'Beauty';
 
--- Q.5 Write a SQL query to find all transactions where the total sales is greater then 1000.
-
+-- Q5: Transactions with total sales > 1000
 SELECT * 
 FROM retail_sales
 WHERE total_sale > 1000;
 
--- Q.6  Write a SQL query to find the total number of transactions (transactions_id) made by 
--- each gender in each category.
-
+-- Q6: Total transactions per gender and category
 SELECT 
-	category,
-	gender,
-	COUNT(transactions_id) AS total_tranactions
+    category,
+    gender,
+    COUNT(transactions_id) AS total_transactions
 FROM retail_sales
-GROUP BY 
-	category, gender
-ORDER BY 1;
+GROUP BY category, gender
+ORDER BY category;
 
--- Q.7  Write a SQL query to calculate the average sales for each month. find out best selling month in each year.
-
+-- Q7: Best-selling month in each year (based on average sales)
 WITH ranked_sales AS (
     SELECT
         YEAR(sale_date) AS year,
         MONTH(sale_date) AS month,
         AVG(total_sale) AS avg_sale,
-        RANK() OVER(PARTITION BY YEAR(sale_date) ORDER BY AVG(total_sale) DESC) AS rank_sales
+        RANK() OVER (PARTITION BY YEAR(sale_date) ORDER BY AVG(total_sale) DESC) AS rank_sales
     FROM retail_sales
-    GROUP BY year, month
+    GROUP BY YEAR(sale_date), MONTH(sale_date)
 )
 SELECT *
 FROM ranked_sales
 WHERE rank_sales = 1;
 
--- Q.8 Write a SQL query to find the top 5 customers based on the highest total sales.
-
+-- Q8: Top 5 customers based on total sales
 SELECT 
     customer_id,
     SUM(total_sale) AS total_sales
@@ -155,19 +153,15 @@ GROUP BY customer_id
 ORDER BY total_sales DESC
 LIMIT 5;
 
-
--- Q.9 Write a SQL query to find the number of unique customers who purchased items from each category
-
+-- Q9: Unique customers per category
 SELECT 
-	category,
-	COUNT(DISTINCT customer_id) AS cnt_unique_cs
+    category,
+    COUNT(DISTINCT customer_id) AS unique_customers
 FROM retail_sales
-GROUP BY 1;
+GROUP BY category;
 
--- Q.10 Write a SQL query to create each shift and number of orders (Example Moring <= 12, Afternoon Between 12&17, Evening > 17)
-
-WITH hourly_sale AS
-(
+-- Q10: Order count by shift (Morning, Afternoon, Evening)
+WITH hourly_sale AS (
     SELECT *,
         CASE
             WHEN HOUR(sale_time) < 12 THEN 'Morning'
@@ -183,5 +177,4 @@ FROM hourly_sale
 GROUP BY shift;
 
 -- End of Project
-
 
