@@ -21,18 +21,18 @@ CREATE DATABASE Retail_Sales_Analysis;
 
 USE Retail_Sales_Analysis;
 
-CREATE TABLE retail_sales(
-    transactions_id INT PRIMARY KEY,
-    sale_date DATE,
-    sale_time TIME,
-    customer_id  INT,
-    gender VARCHAR(15),
-    age INT,
-    category VARCHAR(15),
-    quantity INT,    
-    price_per_unit FLOAT,
-    cogs FLOAT,
-    total_sale FLOAT
+CREATE TABLE retail_sales (
+    transactions_id     INT PRIMARY KEY,
+    sale_date           DATE,
+    sale_time           TIME,
+    customer_id         INT,
+    gender              VARCHAR(15),
+    age                 INT,
+    category            VARCHAR(15),
+    quantity            INT,
+    price_per_unit      FLOAT,
+    cogs                FLOAT,
+    total_sale          FLOAT
 );
 ```
 
@@ -41,31 +41,31 @@ CREATE TABLE retail_sales(
 Check for and remove any rows where critical fields have NULL values:
 
 ```sql
--- Select rows with NULL values
+-- Find NULL records
 SELECT * FROM retail_sales
 WHERE transactions_id IS NULL
-    OR sale_date IS NULL
-    OR sale_time IS NULL
-    OR customer_id IS NULL
-    OR gender IS NULL
-    OR category IS NULL
-    OR quantity IS NULL
-    OR price_per_unit IS NULL
-    OR cogs IS NULL
-    OR total_sale IS NULL;
+   OR sale_date IS NULL
+   OR sale_time IS NULL
+   OR customer_id IS NULL
+   OR gender IS NULL
+   OR category IS NULL
+   OR quantity IS NULL
+   OR price_per_unit IS NULL
+   OR cogs IS NULL
+   OR total_sale IS NULL;
 
--- Delete rows with NULL values
+-- Delete NULL records
 DELETE FROM retail_sales
 WHERE transactions_id IS NULL
-    OR sale_date IS NULL
-    OR sale_time IS NULL
-    OR customer_id IS NULL
-    OR gender IS NULL
-    OR category IS NULL
-    OR quantity IS NULL
-    OR price_per_unit IS NULL
-    OR cogs IS NULL
-    OR total_sale IS NULL;
+   OR sale_date IS NULL
+   OR sale_time IS NULL
+   OR customer_id IS NULL
+   OR gender IS NULL
+   OR category IS NULL
+   OR quantity IS NULL
+   OR price_per_unit IS NULL
+   OR cogs IS NULL
+   OR total_sale IS NULL;
 ```
 
 ### 3. Data Exploration
